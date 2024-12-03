@@ -12,6 +12,7 @@ export default function Orders() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [newOrder, setNewOrder] = useState({ productId: 0, quantity: 1, customerName: '' });
 
+
     useEffect(() => {
         API.get('/orders')
             .then(response => setOrders(response.data))

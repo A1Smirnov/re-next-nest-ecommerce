@@ -19,8 +19,9 @@ export default function Products() {
     const { data, error } = await supabase.from('products').select('*');
     if (error) {
       console.error('Error fetching products:', error);
-    } else if (data) {
-      setProducts(data);
+    } else {
+      // Проверка, что data не равно null
+      setProducts(data ?? []); // Если data == null, установить пустой массив
     }
   };
 
@@ -38,7 +39,7 @@ export default function Products() {
           description: newProduct.description,
         })
         .eq('id', editingProduct.id);
-
+  
       if (error) {
         console.error('Error updating product:', error);
       } else {
@@ -53,12 +54,13 @@ export default function Products() {
       if (error) {
         console.error('Error adding product:', error);
       } else {
-        setProducts((prev) => [...prev, ...data]);
+        // Убедитесь, что data не null
+        setProducts((prev) => [...prev, ...(data ?? [])]);
         setNewProduct({ name: '', price: 0, description: '' });
       }
     }
   };
-
+  
   const removeProduct = async (id: number) => {
     const { error } = await supabase.from('products').delete().eq('id', id);
     if (error) {
@@ -67,6 +69,7 @@ export default function Products() {
       setProducts((prev) => prev.filter((p) => p.id !== id));
     }
   };
+  
 
   const startEditing = (product: Product) => {
     setEditingProduct(product);
