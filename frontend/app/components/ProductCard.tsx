@@ -1,3 +1,5 @@
+// frontend\app\components\ProductCard.tsx
+
 export default function ProductCard({ product }: { product: { name: string; price: number; image: string } }) {
     return (
       <div className="border rounded p-4">

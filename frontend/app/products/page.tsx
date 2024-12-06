@@ -1,28 +1,29 @@
-"use client";
-
 // frontend/app/products/page.tsx
+
+"use client";
 
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { supabase } from "../../src/services/supabaseClient";
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   description?: string;
-  image?: string;
+  imageUrl?: string;
+  category: string; 
 }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState({ name: "", price: 0, description: "", image: "" });
+  const [newProduct, setNewProduct] = useState({ name: "", price: 0, description: "", imageUrl: "", category: "", });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
     const { data, error } = await supabase.from("products").select("*");
     if (error) {
-      console.error("Error fetching products:", error);
+      console.error("Error fetching products:", error.message);
     } else {
       setProducts(data ?? []);
     }
@@ -33,43 +34,56 @@ export default function ProductsPage() {
   }, []);
 
   const addOrUpdateProduct = async () => {
-    if (editingProduct) {
-      const { error } = await supabase
-        .from("products")
-        .update({
-          name: newProduct.name,
-          price: newProduct.price,
-          description: newProduct.description,
-          image: newProduct.image,
-        })
-        .eq("id", editingProduct.id);
-
-      if (error) {
-        console.error("Error updating product:", error);
-      } else {
+    try {
+      if (editingProduct) {
+        const { error } = await supabase
+          .from("products")
+          .update({
+            name: newProduct.name,
+            price: newProduct.price,
+            description: newProduct.description,
+            imageUrl: newProduct.imageUrl,
+            category: newProduct.category, // Отправляем category
+          })
+          .eq("id", editingProduct.id);
+  
+        if (error) throw error;
+  
         setProducts((prev) =>
           prev.map((p) => (p.id === editingProduct.id ? { ...p, ...newProduct } : p))
         );
         setEditingProduct(null);
-        setNewProduct({ name: "", price: 0, description: "", image: "" });
-      }
-    } else {
-      const { data, error } = await supabase.from("products").insert([newProduct]);
-      if (error) {
-        console.error("Error adding product:", error);
+        setNewProduct({ name: "", price: 0, description: "", imageUrl: "", category: "" });
       } else {
+        const { data, error } = await supabase.from("products").insert([
+          {
+            name: newProduct.name,
+            price: newProduct.price,
+            description: newProduct.description,
+            imageUrl: newProduct.imageUrl,
+            category: newProduct.category, // Отправляем category
+            stock: 0, 
+          },
+        ]);
+  
+        if (error) throw error;
+  
         setProducts((prev) => [...prev, ...(data ?? [])]);
-        setNewProduct({ name: "", price: 0, description: "", image: "" });
+        setNewProduct({ name: "", price: 0, description: "", imageUrl: "", category: "" });
       }
+    } catch (err) {
+      console.error("Error processing product:", err);
     }
   };
 
-  const removeProduct = async (id: number) => {
-    const { error } = await supabase.from("products").delete().eq("id", id);
-    if (error) {
-      console.error("Error deleting product:", error);
-    } else {
+  const removeProduct = async (id: string) => {
+    try {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) throw error;
+
       setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error("Error deleting product:", err);
     }
   };
 
@@ -79,7 +93,8 @@ export default function ProductsPage() {
       name: product.name,
       price: product.price,
       description: product.description || "",
-      image: product.image || "",
+      imageUrl: product.imageUrl || "",
+      category: product.category, 
     });
   };
 
@@ -94,7 +109,7 @@ export default function ProductsPage() {
               product={{
                 name: product.name,
                 price: product.price,
-                image: product.image || "default-image-url.jpg",
+                image: product.imageUrl || "default-imageUrl-url.jpg",
               }}
             />
             <div className="flex justify-between mt-2">
@@ -141,11 +156,20 @@ export default function ProductsPage() {
         />
         <input
           type="text"
-          placeholder="Image URL"
-          value={newProduct.image}
-          onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+          placeholder="imageUrl URL"
+          value={newProduct.imageUrl}
+          onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
           className="w-full p-2 mb-4 border rounded"
         />
+    
+        <input
+            type="text"
+            placeholder="Category"
+            value={newProduct.category}
+            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+            className="w-full p-2 mb-2 border rounded"
+         />
+
         <button
           onClick={addOrUpdateProduct}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
