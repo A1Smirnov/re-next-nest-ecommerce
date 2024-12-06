@@ -1,21 +1,33 @@
-"use client"
-// frontend/src/components/Header.tsx
-import React, { useState } from "react";
+// frontend\app\components\Header.tsx
+
+"use client";
+
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import "./header.css";
+// import "./Header.css";
 
 const Header: React.FC = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
-  const isAuthenticated = Boolean(localStorage.getItem("token"));
+
+  useEffect(() => {
+    // Проверяем доступность localStorage перед использованием
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("token");
+      setIsAuthenticated(!!token);
+    }
+  }, []); // Выполняется только один раз при монтировании
 
   const toggleDrawer = () => {
     setDrawerOpen(!isDrawerOpen);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+    }
     router.push("/login"); // Перенаправление после выхода
   };
 
