@@ -1,5 +1,4 @@
 // frontend/app/products/page.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -19,7 +18,13 @@ interface Product {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState({ name: "", price: 0, description: "", imageUrl: "", category: "", });
+  const [newProduct, setNewProduct] = useState({
+    name: "",
+    price: 0,
+    description: "",
+    imageUrl: "",
+    category: "",
+  });
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const fetchProducts = async () => {
@@ -48,9 +53,9 @@ export default function ProductsPage() {
             category: newProduct.category,
           })
           .eq("id", editingProduct.id);
-  
+
         if (error) throw error;
-  
+
         setProducts((prev) =>
           prev.map((p) => (p.id === editingProduct.id ? { ...p, ...newProduct } : p))
         );
@@ -64,12 +69,12 @@ export default function ProductsPage() {
             description: newProduct.description,
             imageUrl: newProduct.imageUrl,
             category: newProduct.category,
-            stock: 0, // TEMPORARY DEFAULT FOR COMPATIBLITY
+            stock: 0, // TEMPORARY DEFAULT FOR COMPATIBILITY
           },
         ]);
-  
+
         if (error) throw error;
-  
+
         setProducts((prev) => [...prev, ...(data ?? [])]);
         setNewProduct({ name: "", price: 0, description: "", imageUrl: "", category: "" });
       }
@@ -106,31 +111,20 @@ export default function ProductsPage() {
       <main className="flex-grow p-8">
         <h1 className="text-2xl font-bold text-center mb-8">Products</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           {products.map((product) => (
-            <div key={product.id}>
-              <ProductCard
-                product={{
-                  name: product.name,
-                  price: product.price,
-                  image: product.imageUrl || "default-imageUrl-url.jpg",
-                }}
-              />
-              <div className="flex justify-between mt-2">
-                <button
-                  onClick={() => startEditing(product)}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => removeProduct(product.id)}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
+            <ProductCard
+              key={product.id}
+              product={{
+                name: product.name,
+                price: product.price,
+                image: product.imageUrl || "default-image-url.jpg",
+                description: product.description,
+                category: product.category,
+              }}
+              onEdit={() => startEditing(product)}
+              onRemove={() => removeProduct(product.id)}
+            />
           ))}
         </div>
 
@@ -138,43 +132,45 @@ export default function ProductsPage() {
           <h2 className="text-xl font-bold mb-4">
             {editingProduct ? "Edit Product" : "Add Product"}
           </h2>
-          <input
-            type="text"
-            placeholder="Name"
-            value={newProduct.name}
-            onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <input
-            type="number"
-            placeholder="Price"
-            value={newProduct.price}
-            onChange={(e) => setNewProduct({ ...newProduct, price: +e.target.value })}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <textarea
-            placeholder="Description"
-            value={newProduct.description}
-            onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={newProduct.imageUrl}
-            onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
-            className="w-full p-2 mb-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Category"
-            value={newProduct.category}
-            onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-            className="w-full p-2 mb-4 border rounded"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              placeholder="Name"
+              value={newProduct.name}
+              onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={newProduct.price}
+              onChange={(e) => setNewProduct({ ...newProduct, price: +e.target.value })}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              placeholder="Image URL"
+              value={newProduct.imageUrl}
+              onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              placeholder="Category"
+              value={newProduct.category}
+              onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+              className="w-full p-2 border rounded"
+            />
+            <textarea
+              placeholder="Description"
+              value={newProduct.description}
+              onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+              className="w-full p-2 border rounded col-span-1 md:col-span-2"
+            />
+          </div>
           <button
             onClick={addOrUpdateProduct}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
             {editingProduct ? "Update Product" : "Add Product"}
           </button>
@@ -184,3 +180,4 @@ export default function ProductsPage() {
     </div>
   );
 }
+
