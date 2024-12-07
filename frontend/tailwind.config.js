@@ -7,14 +7,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#0a74da',
-        secondary: '#ff7043',
-        background: '#f4f6f8',
-      },
-      fontFamily: {
-        sans: ['Roboto', 'Arial', 'sans-serif'],
+        primary: "var(--primary-color)",
+        secondary: "var(--secondary-color)",
+        background: "var(--background-color)",
+        text: "var(--text-color)",
+        footerBg: "var(--footer-bg-color)",
       },
     },
   },
-  plugins: [require('daisyui')],
 };

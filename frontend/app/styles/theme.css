@@ -1,11 +1,15 @@
+/* frontend/app/styles/theme.css */
+
 :root {
-    --primary-color: #0a74da;
-    --secondary-color: #ff7043;
-    --background-color: #f4f6f8;
-  }
-  
-  body {
-    font-family: 'Roboto', Arial, sans-serif;
-    background-color: var(--background-color);
-  }
-  
+  --primary-color: #0a74da;
+  --secondary-color: #ff7043;
+  --background-color: #f4f6f8;
+  --text-color: #ffffff;
+  --footer-bg-color: #0a74da;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
